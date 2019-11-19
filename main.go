@@ -5,6 +5,15 @@ import (
 	"net/http"
 )
 
+type Player struct {
+	Name string
+	ID int
+	Sector string
+	SolarSystem string
+	X int
+	Y int
+}
+
 func home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello world"))
 }
