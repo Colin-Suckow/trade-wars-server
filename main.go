@@ -15,6 +15,13 @@ type Player struct {
 	Y int
 }
 
+type Cargo struct {
+	Name string
+	ID int
+	Description string
+	Value int
+}
+
 type Sector struct {
 	Name string
 	Description string
@@ -38,7 +45,7 @@ type Planet struct {
   Description string
 	ID int
 	X int
-	Y int 
+	Y int
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
