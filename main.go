@@ -9,7 +9,16 @@ type Player struct {
 	Name string
 	ID int
 	Sector string
-	SolarSystem string
+	System string
+	X int
+	Y int
+}
+
+type Sector struct {
+	Name string
+	Description string
+	ID int
+	Systems []System
 	X int
 	Y int
 }
