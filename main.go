@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 )
 
 type Player struct {
@@ -66,7 +67,12 @@ func main() {
 	mux.HandleFunc("/players", clientPlayersScreen)
 	mux.HandleFunc("/map", clientGameScreen)
 
-	log.Println("Starting server on port 80")
-	err := http.ListenAndServe(":80", mux)
+	portVariable := os.Getenv("PORT")
+	if portVariable == "" {
+		portVariable = "4000"
+	}
+
+	log.Println("Starting server on port " + portVariable)
+	err := http.ListenAndServe(":"+portVariable, mux)
 	log.Fatal(err)
 }
