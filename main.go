@@ -23,6 +23,15 @@ type Sector struct {
 	Y int
 }
 
+type System struct {
+	Name string
+	Description string
+	ID int
+  Planets []Planet
+	X int
+	Y int
+}
+
 func home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello world"))
 }
