@@ -6,46 +6,46 @@ import (
 )
 
 type Player struct {
-	Name string
-	ID int
+	Name      string
+	ID        int
 	Inventory []Cargo
-	Sector string
-	System string
-	X int
-	Y int
+	Sector    string
+	System    string
+	X         int
+	Y         int
 }
 
 type Cargo struct {
-	Name string
-	ID int
+	Name        string
+	ID          int
 	Description string
-	Value int
+	Value       int
 }
 
 type Sector struct {
-	Name string
+	Name        string
 	Description string
-	ID int
-	Systems []System
-	X int
-	Y int
+	ID          int
+	Systems     []System
+	X           int
+	Y           int
 }
 
 type System struct {
-	Name string
+	Name        string
 	Description string
-	ID int
-  Planets []Planet
-	X int
-	Y int
+	ID          int
+	Planets     []Planet
+	X           int
+	Y           int
 }
 
 type Planet struct {
-  Name string
-  Description string
-	ID int
-	X int
-	Y int
+	Name        string
+	Description string
+	ID          int
+	X           int
+	Y           int
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
