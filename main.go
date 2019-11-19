@@ -66,7 +66,7 @@ func main() {
 	mux.HandleFunc("/players", clientPlayersScreen)
 	mux.HandleFunc("/map", clientGameScreen)
 
-	log.Println("Starting server on port 4000")
-	err := http.ListenAndServe(":4000", mux)
+	log.Println("Starting server on port 80")
+	err := http.ListenAndServe(":80", mux)
 	log.Fatal(err)
 }
