@@ -8,6 +8,7 @@ import (
 type Player struct {
 	Name string
 	ID int
+	Inventory []Cargo
 	Sector string
 	System string
 	X int
