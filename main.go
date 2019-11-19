@@ -33,6 +33,14 @@ type System struct {
 	Y int
 }
 
+type Planet struct {
+  Name string
+  Description string
+	ID int
+	X int
+	Y int 
+}
+
 func home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello world"))
 }
