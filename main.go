@@ -62,7 +62,7 @@ func clientGameScreen(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", home)
+	mux.HandleFunc("/", clientPlayersScreen)
 	mux.HandleFunc("/players", clientPlayersScreen)
 	mux.HandleFunc("/map", clientGameScreen)
 
