@@ -6,49 +6,6 @@ import (
 	"os"
 )
 
-type Player struct {
-	Name      string
-	ID        int
-	Inventory []Cargo
-	Sector    string
-	System    string
-	X         int
-	Y         int
-}
-
-type Cargo struct {
-	Name        string
-	ID          int
-	Description string
-	Value       int
-}
-
-type Sector struct {
-	Name        string
-	Description string
-	ID          int
-	Systems     []System
-	X           int
-	Y           int
-}
-
-type System struct {
-	Name        string
-	Description string
-	ID          int
-	Planets     []Planet
-	X           int
-	Y           int
-}
-
-type Planet struct {
-	Name        string
-	Description string
-	ID          int
-	X           int
-	Y           int
-}
-
 func home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello world"))
 }
