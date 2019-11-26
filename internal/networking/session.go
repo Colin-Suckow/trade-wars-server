@@ -12,8 +12,11 @@ type callsignPostBody struct {
 }
 
 func IssueCookie(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		EnableCors(&w)
+	EnableCors(&w)
+	if r.Method == http.MethodOptions {
+		return
+	} else if r.Method == http.MethodPost {
+
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			BadRequstError(w)
