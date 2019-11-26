@@ -16,6 +16,7 @@ func main() {
 	mux.HandleFunc("/", handleHome)
 	mux.HandleFunc("/players", networking.ClientPlayersScreen)
 	mux.HandleFunc("/map", networking.ClientGameScreen)
+	mux.HandleFunc("/startSession", networking.IssueCookie)
 
 	portVariable := os.Getenv("PORT")
 	if portVariable == "" {
