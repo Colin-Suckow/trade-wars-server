@@ -7,7 +7,7 @@ import (
 	networking "suckow.dev/trade-wars-server/internal/networking"
 )
 
-func handleHome(w http.ResponseWriter, r *http.Request) {
+func testReturnCallsign(w http.ResponseWriter, r *http.Request) {
 	var cookie, err = r.Cookie("callsign")
 	if err != nil {
 		http.Error(w, "Couldn't read callsign. :(", 500)
@@ -19,10 +19,11 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", handleHome)
+	mux.HandleFunc("/", networking.ClientPlayersScreen)
 	mux.HandleFunc("/players", networking.ClientPlayersScreen)
 	mux.HandleFunc("/map", networking.ClientGameScreen)
 	mux.HandleFunc("/startSession", networking.IssueCookie)
+	mux.HandleFunc("/getCallsign", testReturnCallsign)
 
 	portVariable := os.Getenv("PORT")
 	if portVariable == "" {
