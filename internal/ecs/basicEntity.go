@@ -14,4 +14,5 @@ func makeBasicEntity() BasicEntity {
 
 func (e BasicEntity) addChild(child BasicEntity) {
 	e.childEntities = append(e.childEntities, child)
+	child.parentEntity = &e
 }
