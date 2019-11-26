@@ -8,7 +8,13 @@ import (
 )
 
 func handleHome(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello world"))
+	var cookie, err = r.Cookie("callsign")
+	if err != nil {
+		http.Error(w, "Couldn't read callsign. :(", 500)
+		return
+	}
+	callsign := cookie.Value
+	w.Write([]byte("Hello " + callsign))
 }
 
 func main() {
