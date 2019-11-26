@@ -1,15 +1,16 @@
 package main
 
 import (
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
-	"github.com/joho/godotenv"
 	networking "suckow.dev/trade-wars-server/internal/networking"
 )
 
 func testReturnCallsign(w http.ResponseWriter, r *http.Request) {
-	networking.EnableCors(&w)
+	//networking.EnableCors(&w)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	var cookie, err = r.Cookie("callsign")
 	if err != nil {
 		http.Error(w, "Couldn't read callsign. :(", 500)
