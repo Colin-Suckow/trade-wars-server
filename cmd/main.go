@@ -8,6 +8,7 @@ import (
 )
 
 func testReturnCallsign(w http.ResponseWriter, r *http.Request) {
+	networking.EnableCors(&w)
 	var cookie, err = r.Cookie("callsign")
 	if err != nil {
 		http.Error(w, "Couldn't read callsign. :(", 500)
