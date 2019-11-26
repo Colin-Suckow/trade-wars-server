@@ -15,14 +15,14 @@ func IssueCookie(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-			//TODO respond with error
-			panic(err)
+			BadRequstError(w)
+			return
 		}
 		var callsignData callsignPostBody
 		err = json.Unmarshal(body, &callsignData)
-		if err != nil {
-			//Todo respond with error again
-			panic(err)
+		if err != nil || callsignData.Callsign == "" {
+			BadRequstError(w)
+			return
 		}
 		cookie := http.Cookie{
 			Name:    "callsign",
@@ -31,7 +31,7 @@ func IssueCookie(w http.ResponseWriter, r *http.Request) {
 			Path:    "/",
 		}
 		http.SetCookie(w, &cookie)
-		w.Write([]byte("Sent cookie: " + callsignData.Callsign))
+		w.Write([]byte("{\n\"success\":true,\n\"callsign\":\"" + callsignData.Callsign + "\"\n}")) //TODO make this less bad
 
 	}
 }
