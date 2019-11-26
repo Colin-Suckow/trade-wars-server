@@ -1,6 +1,6 @@
 package tradewars
 
-import "suckow.dev/trade-wars-server/internal/ecs"
+import "github.com/EngoEngine/ecs"
 
 import tradewars "suckow.dev/trade-wars-server/internal/tradewars/Components"
 
