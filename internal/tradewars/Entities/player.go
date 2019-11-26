@@ -8,4 +8,5 @@ type Player struct {
 	ecs.BasicEntity
 	tradewars.NameComponent
 	tradewars.PositionComponent
+	tradewars.OwnershipComponent
 }
