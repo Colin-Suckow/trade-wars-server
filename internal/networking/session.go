@@ -12,7 +12,10 @@ type callsignPostBody struct {
 }
 
 func IssueCookie(w http.ResponseWriter, r *http.Request) {
-	EnableCors(&w)
+	//EnableCors(&w)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 	if r.Method == http.MethodOptions {
 		return
 	} else if r.Method == http.MethodPost {
@@ -35,6 +38,8 @@ func IssueCookie(w http.ResponseWriter, r *http.Request) {
 			Path:    "/",
 		}
 		http.SetCookie(w, &cookie)
+		
+	}
 		w.Write([]byte("{\n\"success\":true,\n\"callsign\":\"" + callsignData.Callsign + "\"\n}")) //TODO make this less bad
 
 	}
