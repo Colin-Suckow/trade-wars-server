@@ -4,7 +4,7 @@ import "math/rand"
 
 type BasicEntity struct {
 	id            uint64
-	parentEntity  BasicEntity
+	parentEntity  *BasicEntity
 	childEntities []BasicEntity
 }
 
