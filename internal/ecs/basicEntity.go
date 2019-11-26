@@ -9,5 +9,9 @@ type BasicEntity struct {
 }
 
 func makeBasicEntity() BasicEntity {
-	return BasicEntity{rand.Uint64()}
+	return BasicEntity{rand.Uint64(), nil, []BasicEntity{}}
+}
+
+func (e BasicEntity) addChild(child BasicEntity) {
+	e.childEntities = append(e.childEntities, child)
 }
