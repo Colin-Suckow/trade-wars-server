@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"github.com/joho/godotenv"
 	networking "suckow.dev/trade-wars-server/internal/networking"
 )
 
@@ -26,12 +27,10 @@ func main() {
 	mux.HandleFunc("/startSession", networking.IssueCookie)
 	mux.HandleFunc("/getCallsign", testReturnCallsign)
 
+	err := godotenv.Load()
 	portVariable := os.Getenv("PORT")
-	if portVariable == "" {
-		portVariable = "4000"
-	}
 
 	log.Println("Starting server on port " + portVariable)
-	err := http.ListenAndServe(":"+portVariable, mux)
+	err = http.ListenAndServe(":"+portVariable, mux)
 	log.Fatal(err)
 }
