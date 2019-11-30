@@ -9,7 +9,7 @@ import (
 )
 
 func testReturnCallsign(w http.ResponseWriter, r *http.Request) {
-	//networking.EnableCors(&w)
+	networking.EnableCors(w)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	var cookie, err = r.Cookie("callsign")
 	if err != nil {
