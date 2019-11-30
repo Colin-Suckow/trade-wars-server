@@ -15,7 +15,7 @@ type positionalEntity struct {
 
 type MapSystem struct {
 	entities []positionalEntity
-	bus      *evbus.EventBus
+	bus      *evbus.Bus
 }
 
 func (m *MapSystem) Add(basic *ecs.BasicEntity, position *tradewars.PositionComponent) {

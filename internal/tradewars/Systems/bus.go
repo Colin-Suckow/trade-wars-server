@@ -10,7 +10,7 @@ import (
 
 type BusSystem struct {
 	entities []ecs.BasicEntity
-	Bus      *evbus.EventBus
+	Bus      *evbus.Bus
 }
 
 func (m *BusSystem) Add(basic *ecs.BasicEntity) {
@@ -45,6 +45,6 @@ func FindBusSystem(systems []ecs.System) *BusSystem {
 		default:
 			//Do nothing
 		}
-		panic("FindBusSystem: Could not find BusSystem in world!")
 	}
+	panic("FindBusSystem: Could not find BusSystem in world!")
 }
