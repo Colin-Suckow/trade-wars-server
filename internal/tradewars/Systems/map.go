@@ -60,3 +60,23 @@ func (m MapSystem) broadcastIndividualPosition(message types.Message) {
 	}
 	m.Bus.Publish("network:error:internal")
 }
+
+func (m MapSystem) moveIndividualPosition(id uint64, dx int, dy int) {
+
+	for _, entity := range m.entities {
+		if entity.ID() == id {
+
+			entity.X += dx
+			entity.Y += dy
+
+			//broadcast new position
+			json, err := json.Marshal(entity.PositionComponent)
+			if err != nil {
+				break //Break from loop and precede to error handler
+			}
+			m.Bus.Publish("network:broadcast:individualposition", json)
+			return
+		}
+	}
+	m.Bus.Publish("network:error:internal")
+}

@@ -1,7 +1,7 @@
 package tradewars
 
 type PositionComponent struct {
-	x int
-	y int
+	X int
+	Y int
 	z int
 }
