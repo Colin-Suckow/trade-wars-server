@@ -44,6 +44,11 @@ func (m *MapSystem) New(world *ecs.World) {
 
 }
 
+func (m *MapSystem) Update(dt float32) {
+	//Do nothing.
+
+}
+
 func (m MapSystem) broadcastIndividualPosition(message types.Message) {
 
 	targetEntity := message.Target

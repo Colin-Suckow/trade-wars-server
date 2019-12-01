@@ -14,5 +14,6 @@ func main() {
 
 	mux := http.NewServeMux()
 	networking.SetupRoutes(mux)
+	networking.InitializeBridge(bus)
 	networking.ServeMux(mux)
 }

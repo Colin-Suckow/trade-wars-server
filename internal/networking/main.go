@@ -27,7 +27,7 @@ func SetupRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/gameServer", initializeWebsocketConnection)
 }
 
-func InitializeBirdge(bus EventBus.Bus) {
+func InitializeBridge(bus EventBus.Bus) {
 	WebsocketBus = bus
 }
 
