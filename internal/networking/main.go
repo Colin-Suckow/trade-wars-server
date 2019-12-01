@@ -1,10 +1,12 @@
 package networking
 
 import (
-	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/asaskevich/EventBus"
+	"github.com/joho/godotenv"
 )
 
 func ServeMux(mux *http.ServeMux) {
@@ -22,6 +24,11 @@ func SetupRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/map", ClientGameScreen)
 	mux.HandleFunc("/startSession", IssueCookie)
 	mux.HandleFunc("/getCallsign", testReturnCallsign)
+	mux.HandleFunc("/gameServer", initializeWebsocketConnection)
+}
+
+func InitializeBirdge(bus EventBus.Bus) {
+	WebsocketBus = bus
 }
 
 func testReturnCallsign(w http.ResponseWriter, r *http.Request) {
