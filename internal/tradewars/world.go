@@ -10,6 +10,8 @@ func InitializeWorld(bus evbus.Bus) {
 	world := ecs.World{}
 
 	//Setup bus system so every other system can have access to main server bus
-	world.AddSystem(&tradewars.BusSystem{Bus: &bus})
+	world.AddSystem(&tradewars.BusSystem{Bus: bus})
+
+	busSystem := &tradewars.MapSystem{Bus: bus}
 
 }

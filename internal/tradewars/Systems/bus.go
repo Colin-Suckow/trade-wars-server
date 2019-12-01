@@ -10,7 +10,7 @@ import (
 
 type BusSystem struct {
 	entities []ecs.BasicEntity
-	Bus      *evbus.Bus
+	Bus      evbus.Bus
 }
 
 func (m *BusSystem) Add(basic *ecs.BasicEntity) {
