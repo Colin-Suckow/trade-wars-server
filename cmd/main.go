@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/asaskevich/EventBus"
 	"net/http"
+
+	"github.com/asaskevich/EventBus"
 	"suckow.dev/trade-wars-server/internal/networking"
 	"suckow.dev/trade-wars-server/internal/tradewars"
 )

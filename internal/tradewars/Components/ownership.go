@@ -4,6 +4,6 @@ package tradewars
 //Callsign for persistant ownership, sessionId for validating requests
 
 type OwnershipComponent struct {
-	callsign  string
-	sessionId int64
+	Callsign  string
+	SessionId uint64
 }

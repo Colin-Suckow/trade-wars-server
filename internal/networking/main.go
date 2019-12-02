@@ -28,6 +28,8 @@ func SetupRoutes(mux *http.ServeMux) {
 }
 
 func InitializeBridge(bus EventBus.Bus) {
+	//Monolithic styled directly setting variables
+	//TODO: Design a proper interface so that the network bridge can access bus
 	WebsocketBus = bus
 }
 
