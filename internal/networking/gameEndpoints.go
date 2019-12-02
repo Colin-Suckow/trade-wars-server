@@ -1,6 +1,7 @@
 package networking
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -50,8 +51,33 @@ func reader(conn *websocket.Conn) {
 			log.Println(err)
 			return
 		}
-
-		log.Println("Recieved message: " + string(p))
-
+		decodeCommand(p, conn)
 	}
+}
+
+func decodeCommand(jsonData []byte, conn *websocket.Conn) {
+	var objmap map[string]interface{}
+	if err := json.Unmarshal(jsonData, &objmap); err != nil {
+		respondInvalid(conn)
+		return
+	}
+
+	command := objmap["command"]
+	if command == nil {
+		respondInvalid(conn)
+		return
+	}
+
+	switch command {
+	case "ping":
+		conn.WriteMessage(websocket.TextMessage, []byte("pong"))
+		return
+	default:
+		respondInvalid(conn)
+	}
+
+}
+
+func respondInvalid(conn *websocket.Conn) {
+	conn.WriteMessage(websocket.TextMessage, []byte("Invalid message"))
 }
