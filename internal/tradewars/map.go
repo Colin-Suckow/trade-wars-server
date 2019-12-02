@@ -65,23 +65,23 @@ func (m *MapSystem) BroadcastIndividualPosition(targetEntity ecs.BasicEntity) {
 	log.Println("Found nothing")
 }
 
-func (m MapSystem) moveIndividualPosition(id uint64, dx int, dy int) {
-	mBus := *m.Bus
+func (m *MapSystem) moveIndividualPosition(targetEntity ecs.BasicEntity, dx int, dy int) {
 	for _, entity := range m.entities {
-		if entity.ID() == id {
+		if entity.ID() == targetEntity.ID() {
 
 			entity.X += dx
 			entity.Y += dy
 
 			//broadcast new position
-			json, err := json.Marshal(entity.PositionComponent)
+			jsonData, err := json.Marshal(entity.PositionComponent)
 			if err != nil {
 				break //Break from loop and precede to error handler
 			}
 
-			mBus.Publish("network:broadcast:json", json)
+			BroadcastJson(string(jsonData))
 			return
 		}
 	}
-	mBus.Publish("network:error:internal")
+	BroadcastJson(string("Test"))
+
 }

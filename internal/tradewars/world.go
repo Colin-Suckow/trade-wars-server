@@ -16,6 +16,7 @@ func InitializeWorld() {
 	world.AddSystem(mapSystem)
 
 	WebsocketBus.Subscribe("tradewars:position", mapSystem.BroadcastIndividualPosition)
+	WebsocketBus.Subscribe("tradewars:movePosition", mapSystem.moveIndividualPosition)
 
 	MainWorld = world
 

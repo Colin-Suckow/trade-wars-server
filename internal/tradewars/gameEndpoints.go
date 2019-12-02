@@ -16,8 +16,9 @@ var upgrader = websocket.Upgrader{
 }
 
 type client struct {
-	conn   *websocket.Conn
-	entity ecs.BasicEntity
+	conn     *websocket.Conn
+	entity   ecs.BasicEntity
+	callsign string
 }
 
 var WebsocketBus EventBus.Bus
@@ -38,7 +39,7 @@ func initializeWebsocketConnection(w http.ResponseWriter, r *http.Request) {
 	//Create new player for new connection
 	newPlayer := NewPlayer("")
 
-	Connections = append(Connections, client{ws, newPlayer})
+	Connections = append(Connections, client{ws, newPlayer, ""})
 	reader(ws)
 }
 
@@ -74,6 +75,10 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 	case "getOwnPosition":
 		WebsocketBus.Publish("tradewars:position", getClientFromConnection(conn).entity)
 		return
+	case "changeOwnPosition":
+		changePosition(conn, jsonData)
+	case "setCallsign":
+		setCallsign(getClientFromConnection(conn), jsonData)
 	default:
 		respondInvalid(conn)
 	}
@@ -100,4 +105,23 @@ func getClientFromConnection(conn *websocket.Conn) client {
 	}
 	log.Println("Could not find connection")
 	panic("Could not find connection!")
+}
+
+func setCallsign(cli client, jsonData []byte) {
+	objmap := readJson(jsonData)
+	cli.callsign = objmap["callsign"].(string)
+	BroadcastJson(cli.callsign)
+}
+
+func changePosition(conn *websocket.Conn, jsonData []byte) {
+	objmap := readJson(jsonData)
+	WebsocketBus.Publish("tradewars:movePosition", getClientFromConnection(conn).entity, int(objmap["x"].(float64)), int(objmap["y"].(float64)))
+}
+
+func readJson(jsonData []byte) map[string]interface{} {
+	var objmap map[string]interface{}
+	if err := json.Unmarshal(jsonData, &objmap); err != nil {
+		panic("could not read json")
+	}
+	return objmap
 }
