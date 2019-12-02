@@ -2,11 +2,9 @@ package tradewars
 
 import (
 	"encoding/json"
-	"log"
-
 	"github.com/EngoEngine/ecs"
 	evbus "github.com/asaskevich/EventBus"
-	
+	"log"
 )
 
 //Handles location of all players and objects
@@ -62,12 +60,12 @@ func (m *MapSystem) BroadcastIndividualPosition(targetEntity ecs.BasicEntity) {
 			}
 			log.Println("Found position")
 
-			if tradewars.MainBus.HasCallback("network:broadcast:json") == true {
+			if MainBus.HasCallback("network:broadcast:json") == true {
 				log.Println("Has callback")
 			} else {
 				log.Println("Does not have callback")
 			}
-			tradewars.MainBus.Publish("network:broadcast:json", "test")
+			MainBus.Publish("network:broadcast:json", "test")
 			log.Println("Published")
 			return
 		}
