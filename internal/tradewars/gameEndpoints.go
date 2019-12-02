@@ -1,4 +1,4 @@
-package networking
+package tradewars
 
 import (
 	"encoding/json"
@@ -8,7 +8,6 @@ import (
 	"github.com/EngoEngine/ecs"
 	"github.com/asaskevich/EventBus"
 	"github.com/gorilla/websocket"
-	"suckow.dev/trade-wars-server/internal/tradewars"
 )
 
 var upgrader = websocket.Upgrader{
@@ -37,7 +36,7 @@ func initializeWebsocketConnection(w http.ResponseWriter, r *http.Request) {
 	ws.WriteMessage(1, []byte("Hi new client!"))
 
 	//Create new player for new connection
-	newPlayer := tradewars.NewPlayer("")
+	newPlayer := NewPlayer("")
 
 	Connections = append(Connections, client{ws, newPlayer})
 	reader(ws)
@@ -74,7 +73,6 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 		return
 	case "getOwnPosition":
 		WebsocketBus.Publish("tradewars:position", getClientFromConnection(conn).entity)
-		conn.WriteMessage(websocket.TextMessage, []byte("sentMessage"))
 		return
 	default:
 		respondInvalid(conn)

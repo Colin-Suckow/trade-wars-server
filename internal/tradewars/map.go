@@ -37,9 +37,6 @@ func (m *MapSystem) Remove(basic ecs.BasicEntity) {
 }
 
 func (m *MapSystem) New(world *ecs.World) {
-	//Get bus from world
-	//log.Println("Assigning bus to mapsystem")
-	m.Bus = FindBusSystem(world.Systems()).Bus
 
 }
 
@@ -53,19 +50,14 @@ func (m *MapSystem) BroadcastIndividualPosition(targetEntity ecs.BasicEntity) {
 	for i, entity := range m.entities {
 		log.Println("loop " + string(i))
 		if entity.ID() == targetEntity.ID() {
-			_, err := json.Marshal(entity.PositionComponent)
+			jsonData, err := json.Marshal(entity.PositionComponent)
 			if err != nil {
 				log.Println("err")
 				break //Break from loop and precede to error handler
 			}
 			log.Println("Found position")
 
-			if MainBus.HasCallback("network:broadcast:json") == true {
-				log.Println("Has callback")
-			} else {
-				log.Println("Does not have callback")
-			}
-			MainBus.Publish("network:broadcast:json", "test")
+			BroadcastJson(string(jsonData))
 			log.Println("Published")
 			return
 		}

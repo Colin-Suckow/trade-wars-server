@@ -1,4 +1,4 @@
-package networking
+package tradewars
 
 import (
 	"github.com/gorilla/websocket"
