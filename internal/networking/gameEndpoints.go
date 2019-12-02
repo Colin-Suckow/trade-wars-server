@@ -72,6 +72,10 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 	case "ping":
 		conn.WriteMessage(websocket.TextMessage, []byte("pong"))
 		return
+	case "getOwnPosition":
+		WebsocketBus.Publish("tradewars:position", getClientFromConnection(conn).entity)
+		conn.WriteMessage(websocket.TextMessage, []byte("sentMessage"))
+		return
 	default:
 		respondInvalid(conn)
 	}
@@ -80,4 +84,22 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 
 func respondInvalid(conn *websocket.Conn) {
 	conn.WriteMessage(websocket.TextMessage, []byte("Invalid message"))
+}
+
+func BroadcastJson(jsonData string) {
+	log.Println("Sending data")
+	for _, client := range Connections {
+		log.Println("Sent a line")
+		client.conn.WriteMessage(websocket.TextMessage, []byte(jsonData))
+	}
+}
+
+func getClientFromConnection(conn *websocket.Conn) client {
+	for _, client := range Connections {
+		if client.conn == conn {
+			return client
+		}
+	}
+	log.Println("Could not find connection")
+	panic("Could not find connection!")
 }

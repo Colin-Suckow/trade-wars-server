@@ -27,10 +27,13 @@ func SetupRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/gameServer", initializeWebsocketConnection)
 }
 
-func InitializeBridge(bus EventBus.Bus) {
+func InitializeBridge(bus *EventBus.Bus) {
 	//Monolithic styled directly setting variables
 	//TODO: Design a proper interface so that the network bridge can access bus
-	WebsocketBus = bus
+	log.Println("Initializing bus")
+	WebsocketBus = *bus
+	WebsocketBus.Subscribe("network:broadcast:json", BroadcastJson)
+	WebsocketBus.Subscribe("network:ws:error:internal", wsInternalError)
 }
 
 func testReturnCallsign(w http.ResponseWriter, r *http.Request) {

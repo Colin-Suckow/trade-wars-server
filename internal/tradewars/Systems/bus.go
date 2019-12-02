@@ -3,6 +3,7 @@ package tradewars
 import (
 	"github.com/EngoEngine/ecs"
 	evbus "github.com/asaskevich/EventBus"
+	"log"
 )
 
 //This system holds the entire applications message bus. Ideally it should not be a system, but I can't think of a better way to make it avilable to other systems
@@ -10,7 +11,7 @@ import (
 
 type BusSystem struct {
 	entities []ecs.BasicEntity
-	Bus      evbus.Bus
+	Bus      *evbus.Bus
 }
 
 func (m *BusSystem) Add(basic *ecs.BasicEntity) {
@@ -38,13 +39,16 @@ func (m *BusSystem) Update(dt float32) {
 
 //FindBusSystem Find self in list of other systems. Used by other systems to get a reference to the main bus
 func FindBusSystem(systems []ecs.System) *BusSystem {
+	log.Println("Finding bus...")
 	for _, system := range systems {
 		switch system.(type) {
 		case *BusSystem:
+			log.Println("Found bus")
 			return system.(*BusSystem)
 		default:
 			//Do nothing
 		}
 	}
+	log.Println("Did not find bus :(")
 	panic("FindBusSystem: Could not find BusSystem in world!")
 }

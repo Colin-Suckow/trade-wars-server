@@ -5,20 +5,25 @@ import (
 	evbus "github.com/asaskevich/EventBus"
 	components "suckow.dev/trade-wars-server/internal/tradewars/Components"
 	entities "suckow.dev/trade-wars-server/internal/tradewars/Entities"
-	tradewars "suckow.dev/trade-wars-server/internal/tradewars/Systems"
+	systems "suckow.dev/trade-wars-server/internal/tradewars/Systems"
 )
 
 var MainWorld ecs.World
+var MainBus evbus.Bus
 
-func InitializeWorld(bus evbus.Bus) {
+func InitializeWorld(bus *evbus.Bus) {
 	world := ecs.World{}
 
 	//Setup bus system so every other system can have access to main server bus
-	world.AddSystem(&tradewars.BusSystem{Bus: bus})
+	world.AddSystem(&systems.BusSystem{Bus: bus})
 
-	world.AddSystem(&tradewars.MapSystem{Bus: bus})
+	mapSystem := &systems.MapSystem{Bus: bus}
+	world.AddSystem(mapSystem)
+	
+	tradewars.MainBus.Subscribe("tradewars:position", mapSystem.BroadcastIndividualPosition)
 
 	MainWorld = world
+	MainBus = mBus
 
 }
 
@@ -29,7 +34,7 @@ func NewPlayer(callsign string) ecs.BasicEntity {
 	for _, system := range MainWorld.Systems() {
 		switch sys := system.(type) {
 
-		case *tradewars.MapSystem:
+		case *systems.MapSystem:
 			sys.Add(&player.BasicEntity, &player.PositionComponent)
 
 		default:

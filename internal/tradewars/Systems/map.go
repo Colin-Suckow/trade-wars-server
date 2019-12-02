@@ -2,26 +2,26 @@ package tradewars
 
 import (
 	"encoding/json"
+	"log"
+
 	"github.com/EngoEngine/ecs"
 	evbus "github.com/asaskevich/EventBus"
-	components "suckow.dev/trade-wars-server/internal/tradewars/Components"
-	tradewars "suckow.dev/trade-wars-server/internal/tradewars/Components"
-	types "suckow.dev/trade-wars-server/internal/tradewars/Types"
+	
 )
 
 //Handles location of all players and objects
 
 type positionalEntity struct {
 	*ecs.BasicEntity
-	*tradewars.PositionComponent
+	*PositionComponent
 }
 
 type MapSystem struct {
 	entities []positionalEntity
-	Bus      evbus.Bus
+	Bus      *evbus.Bus
 }
 
-func (m *MapSystem) Add(basic *ecs.BasicEntity, position *components.PositionComponent) {
+func (m *MapSystem) Add(basic *ecs.BasicEntity, position *PositionComponent) {
 	m.entities = append(m.entities, positionalEntity{basic, position})
 }
 
@@ -40,6 +40,7 @@ func (m *MapSystem) Remove(basic ecs.BasicEntity) {
 
 func (m *MapSystem) New(world *ecs.World) {
 	//Get bus from world
+	//log.Println("Assigning bus to mapsystem")
 	m.Bus = FindBusSystem(world.Systems()).Bus
 
 }
@@ -49,25 +50,33 @@ func (m *MapSystem) Update(dt float32) {
 
 }
 
-func (m MapSystem) broadcastIndividualPosition(message types.Message) {
-
-	targetEntity := message.Target
-
-	for _, entity := range m.entities {
+func (m *MapSystem) BroadcastIndividualPosition(targetEntity ecs.BasicEntity) {
+	log.Println("Started function")
+	for i, entity := range m.entities {
+		log.Println("loop " + string(i))
 		if entity.ID() == targetEntity.ID() {
-			json, err := json.Marshal(entity.PositionComponent)
+			_, err := json.Marshal(entity.PositionComponent)
 			if err != nil {
+				log.Println("err")
 				break //Break from loop and precede to error handler
 			}
-			m.Bus.Publish("network:broadcast:individualposition", json)
+			log.Println("Found position")
+
+			if tradewars.MainBus.HasCallback("network:broadcast:json") == true {
+				log.Println("Has callback")
+			} else {
+				log.Println("Does not have callback")
+			}
+			tradewars.MainBus.Publish("network:broadcast:json", "test")
+			log.Println("Published")
 			return
 		}
 	}
-	m.Bus.Publish("network:error:internal")
+	log.Println("Found nothing")
 }
 
 func (m MapSystem) moveIndividualPosition(id uint64, dx int, dy int) {
-
+	mBus := *m.Bus
 	for _, entity := range m.entities {
 		if entity.ID() == id {
 
@@ -79,9 +88,10 @@ func (m MapSystem) moveIndividualPosition(id uint64, dx int, dy int) {
 			if err != nil {
 				break //Break from loop and precede to error handler
 			}
-			m.Bus.Publish("network:broadcast:individualposition", json)
+
+			mBus.Publish("network:broadcast:json", json)
 			return
 		}
 	}
-	m.Bus.Publish("network:error:internal")
+	mBus.Publish("network:error:internal")
 }
