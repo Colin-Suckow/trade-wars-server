@@ -95,7 +95,7 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 
 	//Commands that require a callsign set
 	switch command {
-	case "changeOwnPosition":
+	case "setOwnPosition":
 		changePosition(client, jsonData)
 	case "getOwnPosition":
 		WebsocketBus.Publish("tradewars:position", client)
