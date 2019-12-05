@@ -24,7 +24,7 @@ func InitializeWorld() {
 
 func NewPlayer(callsign string) ecs.BasicEntity {
 	entity := ecs.NewBasic()
-	player := Player{entity, PositionComponent{0, 0, 0}, OwnershipComponent{callsign, entity.ID()}}
+	player := Player{entity, PositionComponent{0, 0, 0}, OwnershipComponent{callsign}}
 
 	for _, system := range MainWorld.Systems() {
 		switch sys := system.(type) {

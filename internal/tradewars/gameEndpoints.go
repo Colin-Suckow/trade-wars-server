@@ -24,7 +24,7 @@ type client struct {
 var WebsocketBus EventBus.Bus
 
 //Store socket connects so we can write to them
-var Connections []client
+var Connections []*client
 
 func initializeWebsocketConnection(w http.ResponseWriter, r *http.Request) {
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
@@ -38,8 +38,7 @@ func initializeWebsocketConnection(w http.ResponseWriter, r *http.Request) {
 
 	//Create new player for new connection
 	newPlayer := NewPlayer("")
-
-	Connections = append(Connections, client{ws, newPlayer, ""})
+	Connections = append(Connections, &client{ws, newPlayer, "test"})
 	reader(ws)
 }
 
@@ -73,10 +72,10 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 		conn.WriteMessage(websocket.TextMessage, []byte("pong"))
 		return
 	case "getOwnPosition":
-		WebsocketBus.Publish("tradewars:position", getClientFromConnection(conn).entity)
+		WebsocketBus.Publish("tradewars:position", getClientFromConnection(conn))
 		return
 	case "changeOwnPosition":
-		changePosition(conn, jsonData)
+		changePosition(getClientFromConnection(conn), jsonData)
 	case "setCallsign":
 		setCallsign(getClientFromConnection(conn), jsonData)
 	default:
@@ -97,25 +96,40 @@ func BroadcastJson(jsonData string) {
 	}
 }
 
-func getClientFromConnection(conn *websocket.Conn) client {
+func getClientFromConnection(conn *websocket.Conn) *client {
 	for _, client := range Connections {
 		if client.conn == conn {
+			log.Println("Found client: " + client.callsign)
 			return client
 		}
 	}
-	log.Println("Could not find connection")
 	panic("Could not find connection!")
 }
 
-func setCallsign(cli client, jsonData []byte) {
-	objmap := readJson(jsonData)
-	cli.callsign = objmap["callsign"].(string)
-	BroadcastJson(cli.callsign)
+func getClientFromEntity(entity ecs.BasicEntity) *client {
+	for _, client := range Connections {
+		if client.entity.ID() == entity.ID() {
+			return client
+		}
+	}
+	panic("Could not find connection!")
 }
 
-func changePosition(conn *websocket.Conn, jsonData []byte) {
+func setCallsign(cli *client, jsonData []byte) {
 	objmap := readJson(jsonData)
-	WebsocketBus.Publish("tradewars:movePosition", getClientFromConnection(conn).entity, int(objmap["x"].(float64)), int(objmap["y"].(float64)))
+	if objmap["callsign"] == nil {
+		respondInvalid(cli.conn)
+		return
+	}
+	client := *cli
+	client.callsign = objmap["callsign"].(string)
+	*cli = client
+	BroadcastJson("{\"event\":\"changedCallsign\"}")
+}
+
+func changePosition(client *client, jsonData []byte) {
+	objmap := readJson(jsonData)
+	WebsocketBus.Publish("tradewars:movePosition", client.entity, int(objmap["x"].(float64)), int(objmap["y"].(float64)))
 }
 
 func readJson(jsonData []byte) map[string]interface{} {
@@ -124,4 +138,11 @@ func readJson(jsonData []byte) map[string]interface{} {
 		panic("could not read json")
 	}
 	return objmap
+}
+
+func AddTargetToJson(jsonData string, target string) string {
+	//Quick dirty implementation
+	//Assume the input data is correct and just add the field manually after the first character, which is assumed to be a {
+	jsonToInsert := "\"target\":\"" + target + "\","
+	return jsonData[:1] + jsonToInsert + jsonData[1:]
 }

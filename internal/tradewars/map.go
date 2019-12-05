@@ -2,9 +2,9 @@ package tradewars
 
 import (
 	"encoding/json"
+
 	"github.com/EngoEngine/ecs"
 	evbus "github.com/asaskevich/EventBus"
-	"log"
 )
 
 //Handles location of all players and objects
@@ -45,24 +45,20 @@ func (m *MapSystem) Update(dt float32) {
 
 }
 
-func (m *MapSystem) BroadcastIndividualPosition(targetEntity ecs.BasicEntity) {
-	log.Println("Started function")
-	for i, entity := range m.entities {
-		log.Println("loop " + string(i))
-		if entity.ID() == targetEntity.ID() {
+func (m *MapSystem) BroadcastIndividualPosition(targetClient *client) {
+	for _, entity := range m.entities {
+		if entity.ID() == targetClient.entity.ID() {
 			jsonData, err := json.Marshal(entity.PositionComponent)
 			if err != nil {
-				log.Println("err")
-				break //Break from loop and precede to error handler
+				return
 			}
-			log.Println("Found position")
-
-			BroadcastJson(string(jsonData))
-			log.Println("Published")
+			client := *targetClient
+			println("Callsign: ")
+			BroadcastJson(AddTargetToJson(string(jsonData), client.callsign))
 			return
 		}
 	}
-	log.Println("Found nothing")
+
 }
 
 func (m *MapSystem) moveIndividualPosition(targetEntity ecs.BasicEntity, dx int, dy int) {
