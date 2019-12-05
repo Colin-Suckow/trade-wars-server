@@ -21,6 +21,11 @@ type client struct {
 	callsign string
 }
 
+type Event struct {
+	eventType   string
+	eventParams map[string]string
+}
+
 var WebsocketBus EventBus.Bus
 
 //Store socket connects so we can write to them
@@ -69,17 +74,21 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 
 	client := getClientFromConnection(conn)
 
+	if client.callsign == "NULL" {
+		respondInvalid(conn)
+		return
+	}
+
 	switch command {
 	case "ping":
 		conn.WriteMessage(websocket.TextMessage, []byte("pong"))
-		return
 	case "getOwnPosition":
 		WebsocketBus.Publish("tradewars:position", client)
-		return
 	case "changeOwnPosition":
 		changePosition(client, jsonData)
 	case "setCallsign":
 		setCallsign(client, jsonData)
+
 	default:
 		respondInvalid(conn)
 	}
@@ -96,6 +105,10 @@ func BroadcastJson(jsonData string) {
 		log.Println("Sent a line")
 		client.conn.WriteMessage(websocket.TextMessage, []byte(jsonData))
 	}
+}
+
+func broadcastEvent(event Event) {
+
 }
 
 func getClientFromConnection(conn *websocket.Conn) *client {
