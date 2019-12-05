@@ -48,8 +48,6 @@ func initializeWebsocketConnection(w http.ResponseWriter, r *http.Request) {
 	reader(ws)
 }
 
-//func checkIfCallsignExists()
-
 func reader(conn *websocket.Conn) {
 	for {
 		//Read in new message
@@ -77,6 +75,8 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 		respondInvalid(client)
 		return
 	}
+
+	log.Println("Recieved " + command.(string) + " from " + client.callsign)
 
 	//Commands that are valid without a callsign set
 	switch command {
@@ -159,7 +159,6 @@ func buildEmptyEvent(eventName string, target client) Event {
 func getClientFromConnection(conn *websocket.Conn) *client {
 	for _, client := range Connections {
 		if client.conn == conn {
-			log.Println("Found client: " + client.callsign)
 			return client
 		}
 	}
