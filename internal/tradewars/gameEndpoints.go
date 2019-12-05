@@ -38,7 +38,7 @@ func initializeWebsocketConnection(w http.ResponseWriter, r *http.Request) {
 
 	//Create new player for new connection
 	newPlayer := NewPlayer("")
-	Connections = append(Connections, &client{ws, newPlayer, "test"})
+	Connections = append(Connections, &client{ws, newPlayer, "NULL"})
 	reader(ws)
 }
 
