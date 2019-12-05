@@ -42,7 +42,6 @@ func initializeWebsocketConnection(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("Client connected")
-	ws.WriteMessage(1, []byte("Hi new client!"))
 
 	//Create new player for new connection
 	newPlayer := NewPlayer("")
