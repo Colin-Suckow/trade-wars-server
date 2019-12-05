@@ -67,17 +67,19 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 		return
 	}
 
+	client := getClientFromConnection(conn)
+
 	switch command {
 	case "ping":
 		conn.WriteMessage(websocket.TextMessage, []byte("pong"))
 		return
 	case "getOwnPosition":
-		WebsocketBus.Publish("tradewars:position", getClientFromConnection(conn))
+		WebsocketBus.Publish("tradewars:position", client)
 		return
 	case "changeOwnPosition":
-		changePosition(getClientFromConnection(conn), jsonData)
+		changePosition(client, jsonData)
 	case "setCallsign":
-		setCallsign(getClientFromConnection(conn), jsonData)
+		setCallsign(client, jsonData)
 	default:
 		respondInvalid(conn)
 	}

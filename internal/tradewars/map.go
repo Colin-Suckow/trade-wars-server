@@ -2,6 +2,7 @@ package tradewars
 
 import (
 	"encoding/json"
+	"log"
 
 	"github.com/EngoEngine/ecs"
 	evbus "github.com/asaskevich/EventBus"
@@ -52,9 +53,9 @@ func (m *MapSystem) BroadcastIndividualPosition(targetClient *client) {
 			if err != nil {
 				return
 			}
-			client := *targetClient
-			println("Callsign: ")
-			BroadcastJson(AddTargetToJson(string(jsonData), client.callsign))
+
+			log.Println("Callsign: " + targetClient.callsign)
+			BroadcastJson(AddTargetToJson(string(jsonData), targetClient.callsign))
 			return
 		}
 	}
