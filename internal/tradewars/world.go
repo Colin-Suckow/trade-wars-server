@@ -2,6 +2,7 @@ package tradewars
 
 import (
 	"github.com/EngoEngine/ecs"
+	"github.com/jasonlvhit/gocron"
 )
 
 var MainWorld ecs.World
@@ -18,6 +19,9 @@ func InitializeWorld() {
 	WebsocketBus.Subscribe("tradewars:position", mapSystem.BroadcastIndividualPosition)
 	WebsocketBus.Subscribe("tradewars:positionRespondAll", mapSystem.RespondAllIndividualPosition)
 	WebsocketBus.Subscribe("tradewars:movePosition", mapSystem.moveIndividualPosition)
+
+	//Setup tick
+	go startTick()
 
 	MainWorld = world
 
@@ -41,4 +45,9 @@ func NewPlayer(callsign string) ecs.BasicEntity {
 
 	return entity
 
+}
+
+func startTick() {
+	gocron.Every(10).Seconds().Do(checkConnections)
+	<-gocron.Start()
 }

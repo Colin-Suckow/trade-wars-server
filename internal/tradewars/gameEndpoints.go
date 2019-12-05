@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/EngoEngine/ecs"
 	"github.com/asaskevich/EventBus"
@@ -19,6 +20,7 @@ type client struct {
 	conn     *websocket.Conn
 	entity   ecs.BasicEntity
 	callsign string
+	lastPing time.Time
 }
 
 type Event struct {
@@ -44,7 +46,7 @@ func initializeWebsocketConnection(w http.ResponseWriter, r *http.Request) {
 
 	//Create new player for new connection
 	newPlayer := NewPlayer("")
-	Connections = append(Connections, &client{ws, newPlayer, "NULL"})
+	Connections = append(Connections, &client{ws, newPlayer, "NULL", time.Now()})
 	reader(ws)
 }
 
@@ -81,7 +83,7 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 	//Commands that are valid without a callsign set
 	switch command {
 	case "ping":
-		conn.WriteMessage(websocket.TextMessage, []byte("pong"))
+		handlePing(client)
 		return
 	case "setCallsign":
 		setCallsign(client, jsonData)
@@ -207,9 +209,44 @@ func recieveChat(cli *client, jsonData []byte) {
 	broadcastEvent(buildEvent("chatMessage", *cli, map[string]interface{}{"message": objmap["message"]}))
 }
 
+func handlePing(cli *client) {
+
+	cli.lastPing = time.Now()
+
+	//Directly write output for simplicity
+	cli.conn.WriteMessage(websocket.TextMessage, []byte("pong"))
+}
+
+func checkConnections() {
+	pongTimeout := 20 * time.Second
+	currentTime := time.Now()
+	for _, client := range Connections {
+		if currentTime.Sub(client.lastPing) > pongTimeout {
+			disconnectClient(client)
+		}
+	}
+}
+
+func disconnectClient(cli *client) {
+	log.Println(cli.callsign + ":" + string(cli.entity.GetBasicEntity().ID()) + " disconnected. Reason: Timeout")
+	for i, client := range Connections {
+		if client.entity.ID() == cli.entity.ID() {
+			respondEvent(cli, buildEvent("disconnect", *cli, map[string]interface{}{"reason": "timeout"}))
+			client.conn.Close()
+			Connections = remove(Connections, i)
+		}
+	}
+}
+
 func AddTargetToJson(jsonData string, target string) string {
 	//Quick dirty implementation
 	//Assume the input data is correct and just add the field manually after the first character, which is assumed to be a {
 	jsonToInsert := "\"target\":\"" + target + "\","
 	return jsonData[:1] + jsonToInsert + jsonData[1:]
+}
+
+func remove(s []*client, i int) []*client {
+	s[i] = s[len(s)-1]
+	// We do not need to put s[i] at the end, as it will be discarded anyway
+	return s[:len(s)-1]
 }
