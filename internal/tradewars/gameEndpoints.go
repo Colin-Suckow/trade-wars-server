@@ -48,6 +48,8 @@ func initializeWebsocketConnection(w http.ResponseWriter, r *http.Request) {
 	reader(ws)
 }
 
+//func checkIfCallsignExists()
+
 func reader(conn *websocket.Conn) {
 	for {
 		//Read in new message
@@ -99,6 +101,11 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 		changePosition(client, jsonData)
 	case "getOwnPosition":
 		WebsocketBus.Publish("tradewars:position", client)
+
+	case "getAllPosition":
+		for _, cli := range Connections {
+			WebsocketBus.Publish("tradewars:positionRespondAll", client, cli)
+		}
 
 	case "chatMessage":
 		recieveChat(client, jsonData)

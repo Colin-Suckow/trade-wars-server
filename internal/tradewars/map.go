@@ -57,6 +57,19 @@ func (m *MapSystem) BroadcastIndividualPosition(targetClient *client) {
 
 }
 
+func (m *MapSystem) RespondAllIndividualPosition(targetClient *client, loopedClient *client) {
+	for _, entity := range m.entities {
+		if entity.BasicEntity.ID() == loopedClient.entity.ID() {
+			respondEvent(targetClient, buildEvent("positionUpdate", *loopedClient, map[string]interface{}{
+				"x": entity.PositionComponent.X,
+				"y": entity.PositionComponent.Y,
+			}))
+		}
+
+	}
+
+}
+
 func (m *MapSystem) moveIndividualPosition(targetClient *client, x int, y int) {
 	for _, entity := range m.entities {
 		if entity.ID() == targetClient.entity.ID() {
