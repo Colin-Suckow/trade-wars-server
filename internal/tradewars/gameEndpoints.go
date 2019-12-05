@@ -100,6 +100,9 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 	case "getOwnPosition":
 		WebsocketBus.Publish("tradewars:position", client)
 
+	case "chatMessage":
+		recieveChat(client, jsonData)
+
 	default:
 		respondInvalid(client)
 	}
@@ -187,6 +190,15 @@ func readJson(jsonData []byte) map[string]interface{} {
 		panic("could not read json")
 	}
 	return objmap
+}
+
+func recieveChat(cli *client, jsonData []byte) {
+	objmap := readJson(jsonData)
+	if objmap["message"] == nil {
+		respondInvalid(cli)
+		return
+	}
+	broadcastEvent(buildEvent("chatMessage", *cli, map[string]interface{}{"message": objmap["message"]}))
 }
 
 func AddTargetToJson(jsonData string, target string) string {
