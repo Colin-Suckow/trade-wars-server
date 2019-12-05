@@ -171,15 +171,14 @@ func setCallsign(cli *client, jsonData []byte) {
 		respondInvalid(cli)
 		return
 	}
-	client := *cli
-	client.callsign = objmap["callsign"].(string)
-	*cli = client
-	BroadcastJson("{\"event\":\"changedCallsign\"}")
+	oldCallsign := cli.callsign
+	cli.callsign = objmap["callsign"].(string)
+	broadcastEvent(buildEvent("callsignChange", *cli, map[string]interface{}{"old": oldCallsign}))
 }
 
 func changePosition(client *client, jsonData []byte) {
 	objmap := readJson(jsonData)
-	WebsocketBus.Publish("tradewars:movePosition", client.entity, int(objmap["x"].(float64)), int(objmap["y"].(float64)))
+	WebsocketBus.Publish("tradewars:movePosition", client, int(objmap["x"].(float64)), int(objmap["y"].(float64)))
 }
 
 func readJson(jsonData []byte) map[string]interface{} {

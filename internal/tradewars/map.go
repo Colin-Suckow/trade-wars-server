@@ -1,9 +1,6 @@
 package tradewars
 
 import (
-	"encoding/json"
-	"log"
-
 	"github.com/EngoEngine/ecs"
 	evbus "github.com/asaskevich/EventBus"
 )
@@ -49,33 +46,28 @@ func (m *MapSystem) Update(dt float32) {
 func (m *MapSystem) BroadcastIndividualPosition(targetClient *client) {
 	for _, entity := range m.entities {
 		if entity.ID() == targetClient.entity.ID() {
-			jsonData, err := json.Marshal(entity.PositionComponent)
-			if err != nil {
-				return
-			}
 
-			log.Println("Callsign: " + targetClient.callsign)
-			BroadcastJson(AddTargetToJson(string(jsonData), targetClient.callsign))
+			broadcastEvent(buildEvent("positionUpdate", *targetClient, map[string]interface{}{
+				"x": entity.PositionComponent.X,
+				"y": entity.PositionComponent.Y,
+			}))
 			return
 		}
 	}
 
 }
 
-func (m *MapSystem) moveIndividualPosition(targetEntity ecs.BasicEntity, dx int, dy int) {
+func (m *MapSystem) moveIndividualPosition(targetClient *client, dx int, dy int) {
 	for _, entity := range m.entities {
-		if entity.ID() == targetEntity.ID() {
+		if entity.ID() == targetClient.entity.ID() {
 
 			entity.X += dx
 			entity.Y += dy
 
-			//broadcast new position
-			jsonData, err := json.Marshal(entity.PositionComponent)
-			if err != nil {
-				break //Break from loop and precede to error handler
-			}
-
-			BroadcastJson(string(jsonData))
+			broadcastEvent(buildEvent("positionUpdate", *targetClient, map[string]interface{}{
+				"x": entity.PositionComponent.X,
+				"y": entity.PositionComponent.Y,
+			}))
 			return
 		}
 	}
