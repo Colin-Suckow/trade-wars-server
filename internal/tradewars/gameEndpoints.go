@@ -213,8 +213,7 @@ func handlePing(cli *client) {
 
 	cli.lastPing = time.Now()
 
-	//Directly write output for simplicity
-	cli.conn.WriteMessage(websocket.TextMessage, []byte("pong"))
+	respondEvent(cli, buildEmptyEvent("pong", *cli))
 }
 
 func checkConnections() {
