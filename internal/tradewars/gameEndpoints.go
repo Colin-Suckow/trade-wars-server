@@ -74,20 +74,30 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 
 	client := getClientFromConnection(conn)
 
+	//Commands that are valid without a callsign set
+	switch command {
+	case "ping":
+		conn.WriteMessage(websocket.TextMessage, []byte("pong"))
+		return
+	case "setCallsign":
+		setCallsign(client, jsonData)
+		return
+	default:
+		//Let the other switch handle it
+	}
+
 	if client.callsign == "NULL" {
 		respondInvalid(conn)
 		return
 	}
 
+	//Commands that require a callsign set
 	switch command {
-	case "ping":
-		conn.WriteMessage(websocket.TextMessage, []byte("pong"))
-	case "getOwnPosition":
-		WebsocketBus.Publish("tradewars:position", client)
 	case "changeOwnPosition":
 		changePosition(client, jsonData)
-	case "setCallsign":
-		setCallsign(client, jsonData)
+	case "getOwnPosition":
+		WebsocketBus.Publish("tradewars:position", client)
+		return
 
 	default:
 		respondInvalid(conn)
@@ -108,8 +118,16 @@ func BroadcastJson(jsonData string) {
 }
 
 func broadcastEvent(event Event) {
+	jsonData, err := json.Marshal(event)
 
+	if err != nil {
+		return
+	}
+
+	BroadcastJson(string(jsonData))
 }
+
+//func buildEvent()
 
 func getClientFromConnection(conn *websocket.Conn) *client {
 	for _, client := range Connections {
