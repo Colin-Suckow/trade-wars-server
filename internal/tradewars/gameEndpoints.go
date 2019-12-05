@@ -22,8 +22,9 @@ type client struct {
 }
 
 type Event struct {
-	eventType   string
-	eventParams map[string]string
+	EventType   string
+	Target      string
+	EventParams map[string]interface{}
 }
 
 var WebsocketBus EventBus.Bus
@@ -97,7 +98,6 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 		changePosition(client, jsonData)
 	case "getOwnPosition":
 		WebsocketBus.Publish("tradewars:position", client)
-		return
 
 	default:
 		respondInvalid(conn)
@@ -127,7 +127,19 @@ func broadcastEvent(event Event) {
 	BroadcastJson(string(jsonData))
 }
 
-//func buildEvent()
+func respondEvent(cli *client, event Event) {
+	jsonData, err := json.Marshal(event)
+
+	if err != nil {
+		return
+	}
+
+	cli.conn.WriteMessage(websocket.TextMessage, jsonData)
+}
+
+func buildEvent(eventName string, target client, arguments map[string]interface{}) Event {
+	return Event{eventName, target.callsign, arguments}
+}
 
 func getClientFromConnection(conn *websocket.Conn) *client {
 	for _, client := range Connections {
