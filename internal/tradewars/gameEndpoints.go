@@ -61,19 +61,20 @@ func reader(conn *websocket.Conn) {
 }
 
 func decodeCommand(jsonData []byte, conn *websocket.Conn) {
+
+	client := getClientFromConnection(conn)
+
 	var objmap map[string]interface{}
 	if err := json.Unmarshal(jsonData, &objmap); err != nil {
-		respondInvalid(conn)
+		respondInvalid(client)
 		return
 	}
 
 	command := objmap["command"]
 	if command == nil {
-		respondInvalid(conn)
+		respondInvalid(client)
 		return
 	}
-
-	client := getClientFromConnection(conn)
 
 	//Commands that are valid without a callsign set
 	switch command {
@@ -88,7 +89,7 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 	}
 
 	if client.callsign == "NULL" {
-		respondInvalid(conn)
+		respondInvalid(client)
 		return
 	}
 
@@ -100,13 +101,13 @@ func decodeCommand(jsonData []byte, conn *websocket.Conn) {
 		WebsocketBus.Publish("tradewars:position", client)
 
 	default:
-		respondInvalid(conn)
+		respondInvalid(client)
 	}
 
 }
 
-func respondInvalid(conn *websocket.Conn) {
-	conn.WriteMessage(websocket.TextMessage, []byte("Invalid message"))
+func respondInvalid(cli *client) {
+	respondEvent(cli, buildEmptyEvent("invalidRequest", *cli))
 }
 
 func BroadcastJson(jsonData string) {
@@ -141,6 +142,10 @@ func buildEvent(eventName string, target client, arguments map[string]interface{
 	return Event{eventName, target.callsign, arguments}
 }
 
+func buildEmptyEvent(eventName string, target client) Event {
+	return buildEvent(eventName, target, map[string]interface{}{})
+}
+
 func getClientFromConnection(conn *websocket.Conn) *client {
 	for _, client := range Connections {
 		if client.conn == conn {
@@ -163,7 +168,7 @@ func getClientFromEntity(entity ecs.BasicEntity) *client {
 func setCallsign(cli *client, jsonData []byte) {
 	objmap := readJson(jsonData)
 	if objmap["callsign"] == nil {
-		respondInvalid(cli.conn)
+		respondInvalid(cli)
 		return
 	}
 	client := *cli
